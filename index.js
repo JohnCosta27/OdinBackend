@@ -4,16 +4,11 @@ const helmet = require('helmet');
 const { clientOrigins, serverPort } = require('./config/env.dev');
 const { checkJwt } = require('./auth/check-jwt');
 const jwtDecode = require('jwt-decode');
-const { createClient } = require('@supabase/supabase-js');
+const jwtAuthz = require('express-jwt-authz');
+const supabase = require('./auth/supabase');
 
 const app = express();
 const apiRouter = express.Router();
-
-const supabase = createClient(
-	'https://sbogvmcjtjrgffqnydly.supabase.co',
-	process.env.SUPABASE_KEY
-);
-
 /**
  *  App Configuration
  */
@@ -35,7 +30,8 @@ apiRouter.get('/public', (req, res) => {
  */
 apiRouter.get('/sync', checkJwt, async (req, res) => {
 	const jwt = jwtDecode(req.headers.authorization.substring(7));
-
+	//* When user accesses the system, an account is created. If user is already created
+	//* Then there will be an error.
 	const { data, error } = await supabase
 		.from('users')
 		.insert([{ id: jwt.sub }]);
@@ -43,7 +39,7 @@ apiRouter.get('/sync', checkJwt, async (req, res) => {
 	res.status(200).send({ message: 'Synchronisation successful' });
 });
 
-apiRouter.get('/protected', checkJwt, (req, res) => {
+apiRouter.get('/protected', checkJwt, jwtAuthz(['create:subjects'], {customScopeKey: "permissions"}), (req, res) => {
 	res.status(200).send({ message: 'This is a protected method' });
 });
 

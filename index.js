@@ -7,6 +7,7 @@ const jwtDecode = require('jwt-decode');
 const jwtAuthz = require('express-jwt-authz');
 const supabase = require('./auth/supabase');
 
+const subjectRouter = require('./routers/subjects.router');
 const app = express();
 const apiRouter = express.Router();
 /**
@@ -18,6 +19,7 @@ app.use(cors({ origin: clientOrigins }));
 app.use(express.json());
 
 app.use('/api', apiRouter);
+app.use('/subjects', subjectRouter);
 
 apiRouter.get('/public', (req, res) => {
 	res.status(200).send({ message: 'This is a public method' });
@@ -29,9 +31,9 @@ apiRouter.get('/public', (req, res) => {
  * TODO: Login times in database (later down the line)
  */
 apiRouter.get('/sync', checkJwt, async (req, res) => {
-	const jwt = jwtDecode(req.headers.authorization.substring(7));
 	//* When user accesses the system, an account is created. If user is already created
 	//* Then there will be an error.
+	const jwt = jwtDecode(req.headers.authorization.substring(7));
 	const { data, error } = await supabase
 		.from('users')
 		.insert([{ id: jwt.sub }]);

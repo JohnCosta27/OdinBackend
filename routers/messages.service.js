@@ -15,7 +15,22 @@ const getSuccessMessage = () => {
     }
 }
 
+const getGeneralError = (error) => {
+    return {
+        message: 'An error has occured',
+        error: error
+    }
+}
+
+const getMissingParametersError = () => {
+    return {
+        message: 'Some parameters were missing from the request'
+    }
+}
+
 module.exports = {
     getDbErrorMessage,
-    getSuccessMessage
+    getSuccessMessage,
+    getGeneralError,
+    getMissingParametersError
 }

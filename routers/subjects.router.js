@@ -98,6 +98,19 @@ subjects.get('/getall', async (req, res) => {
 	}
 });
 
+subjects.get('/get', async (req, res) => {
+	const { data, error } = await supabase
+		.from('subjects')
+		.select('*, topics (*)')
+		.match({ id: req.query.subjectid });
+
+	if (error != undefined) {
+		res.status(400).send(getDbErrorMessage(error));
+	} else {
+		res.status(200).send(data);
+	}
+});
+
 subjects.get('/getalltopics', async (req, res) => {
 	const { data, error } = await supabase
 		.from('topics')

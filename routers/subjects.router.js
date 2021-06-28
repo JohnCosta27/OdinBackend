@@ -100,9 +100,9 @@ subjects.get('/getall', async (req, res) => {
 
 subjects.get('/get', async (req, res) => {
 	const { data, error } = await supabase
-		.from('subjects')
-		.select('*, topics (*)')
-		.match({ id: req.query.subjectid });
+		.from('topics')
+		.select('*, points (*), subjects (*)')
+		.match({ subjectid: req.query.subjectid })
 
 	if (error != undefined) {
 		res.status(400).send(getDbErrorMessage(error));

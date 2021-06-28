@@ -79,6 +79,9 @@ subjects.post(
 					.from('points')
 					.insert(insertData);
 
+				console.log(data);
+				console.log(error);
+
 				if (error != undefined) {
 					res.status(400).send(getDbErrorMessage(error));
 				} else {

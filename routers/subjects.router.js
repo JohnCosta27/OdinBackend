@@ -79,9 +79,6 @@ subjects.post(
 					.from('points')
 					.insert(insertData);
 
-				console.log(data);
-				console.log(error);
-
 				if (error != undefined) {
 					res.status(400).send(getDbErrorMessage(error));
 				} else {
@@ -92,7 +89,7 @@ subjects.post(
 	}
 );
 
-subjects.get('/getall', async (req, res) => {
+subjects.get('/getall', checkJwt, async (req, res) => {
 	const { data, error } = await supabase.from('subjects').select('*');
 	if (error != undefined) {
 		res.status(400).send(getDbErrorMessage(error));
@@ -101,11 +98,11 @@ subjects.get('/getall', async (req, res) => {
 	}
 });
 
-subjects.get('/get', async (req, res) => {
+subjects.get('/get', checkJwt, async (req, res) => {
 	const { data, error } = await supabase
 		.from('topics')
 		.select('*, points (*), subjects (*)')
-		.match({ subjectid: req.query.subjectid })
+		.match({ subjectid: req.query.subjectid });
 
 	if (error != undefined) {
 		res.status(400).send(getDbErrorMessage(error));
@@ -114,7 +111,7 @@ subjects.get('/get', async (req, res) => {
 	}
 });
 
-subjects.get('/getalltopics', async (req, res) => {
+subjects.get('/getalltopics', checkJwt, async (req, res) => {
 	const { data, error } = await supabase
 		.from('topics')
 		.select('*')
@@ -123,6 +120,22 @@ subjects.get('/getalltopics', async (req, res) => {
 		res.status(400).send(getDbErrorMessage(error));
 	} else {
 		res.status(200).send(data);
+	}
+});
+
+subjects.get('/getpoints', checkJwt, async (req, res) => {
+	try {
+		const { data, error } = await supabase
+			.from('points')
+			.select('*')
+			.match({ topicid: req.query.topicid });
+		if (error != undefined) {
+			res.status(400).send(getDbErrorMessage(error));
+		} else {
+			res.status(200).send(data);
+		}
+	} catch (error) {
+		res.status(400).send(getDbErrorMessage(error));
 	}
 });
 

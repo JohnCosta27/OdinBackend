@@ -18,6 +18,11 @@ const headers = supabase.storage.headers
 
 const files = express.Router();
 
+/**
+ * *Supabase is in the process of allowing server-side uploading without these requests
+ * !When that happens this will have to be changed but for now it works
+ */
+
 files.post('/upload', checkJwt, upload.single('note'), async (req, res) => {
 	console.log(req.file);
 	const createNote = await createNoteDb(req.file.originalname)

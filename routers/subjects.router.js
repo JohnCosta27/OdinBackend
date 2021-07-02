@@ -139,4 +139,20 @@ subjects.get('/getpoints', checkJwt, async (req, res) => {
 	}
 });
 
+subjects.get('/getpoint', checkJwt, async (req, res) => {
+	try {
+		const { data, error } = await supabase
+			.from('points')
+			.select('*, topics (*)')
+			.match({ id: req.query.pointid });
+		if (error != undefined) {
+			res.status(400).send(getDbErrorMessage(error));
+		} else {
+			res.status(200).send(data);
+		}
+	} catch (error) {
+		res.status(400).send(getDbErrorMessage(error));
+	}
+});
+
 module.exports = subjects;

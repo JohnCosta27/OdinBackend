@@ -9,6 +9,7 @@ const supabase = require('./auth/supabase');
 
 const subjectRouter = require('./routers/subjects.router');
 const progressRouter = require('./routers/progress.router');
+const filesRouter = require('./routers/files.router');
 const app = express();
 const apiRouter = express.Router();
 
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use('/api', apiRouter);
 app.use('/subjects', subjectRouter);
 app.use('/progress', progressRouter);
+app.use('/files', filesRouter);
 
 apiRouter.get('/public', (req, res) => {
 	res.status(200).send({ message: 'This is a public method' });

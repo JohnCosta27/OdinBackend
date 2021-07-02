@@ -8,13 +8,19 @@ const {
 	getSuccessMessage,
 	getMissingParametersError,
 } = require('./messages.service');
-const { checkUndefined, checkError } = require('./utilities.service');
 const multer = require('multer');
-const upload = multer({ dest: './files/' });
+const storage = multer.memoryStorage();
+const upload = multer({storage: storage});
+const axios = require('axios');
+const bucketName = 'notes'
+const path = `${supabase.storage.url}/object/${bucketName}/`
+const headers = supabase.storage.headers
+
 const files = express.Router();
 
 files.post('/upload', checkJwt, upload.single('note'), async (req, res) => {
-	const createNote = await createNoteDb(req.file.filename)
+	console.log(req.file);
+	const createNote = await createNoteDb(req.file.originalname)
 	if (createNote.error != undefined) {
 		res.send(getDbErrorMessage(createNote.error));
 	} else {
@@ -24,6 +30,12 @@ files.post('/upload', checkJwt, upload.single('note'), async (req, res) => {
 		if (error != undefined) {
 			res.send(getDbErrorMessage(error));
 		} else {
+			axios({
+				method: "POST",
+				url: path + req.file.originalname,
+				headers: headers,
+				data: req.file.buffer,
+			  });
 			res.send(getSuccessMessage());
 		}
 	}

@@ -8,18 +8,14 @@ const {
 	getSuccessMessage,
 	getMissingParametersError,
 } = require('./messages.service');
-const { checkUndefined, checkError } = require('./utilities.service');
-const progress = express.Router();
+const users = express.Router();
 
-/**
- * !Very dirty query.
- */
-progress.get('/get', checkJwt, async (req, res) => {
+users.get('/subjects', checkJwt, async (req, res) => {
 	const jwt = jwtDecode(req.headers.authorization.substring(7));
 	const { data, error } = await supabase
-		.from('student_points')
-		.select('*, points (*, topics (*, subjects(*)))')
-		.match({ student_id: jwt.sub });
+		.from('student_subjects')
+		.select('*')
+		.match({ studentid: jwt.sub });
 	if (error != undefined) {
 		res.status(400).send(getDbErrorMessage(error));
 	} else {
@@ -27,21 +23,18 @@ progress.get('/get', checkJwt, async (req, res) => {
 	}
 });
 
-progress.post('/add', checkJwt, async (req, res) => {
-	let points = [];
+users.post('/addsubject', checkJwt, async (req, res) => {
 	const jwt = jwtDecode(req.headers.authorization.substring(7));
-	for (let point of req.body.points) {
-		points.push({ points_id: point, student_id: jwt.sub });
-	}
-
 	const { data, error } = await supabase
-		.from('student_points')
-		.insert(points);
+		.from('student_subjects')
+		.insert([
+			{ studentid: jwt.sub, subjectid: req.body.subjectid },
+		]);
 	if (error != undefined) {
 		res.status(400).send(getDbErrorMessage(error));
 	} else {
-		res.status(200).send(getSuccessMessage());
+		res.status(200).send(data);
 	}
 });
 
-module.exports = progress;
+module.exports = users;

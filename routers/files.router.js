@@ -18,7 +18,7 @@ const getPath = `${supabase.storage.url}/object/authenticated/${bucketName}/`;
 const headers = supabase.storage.headers;
 const FormData = require('form-data');
 const request = require('request');
-
+const sizeOf = require('buffer-image-size');
 const files = express.Router();
 
 /**
@@ -27,7 +27,8 @@ const files = express.Router();
  */
 
 files.post('/upload', checkJwt, upload.single('note'), async (req, res) => {
-	const createNote = await createNoteDb(req.file.originalname);
+	const dimensions = sizeOf(req.file.buffer);
+	const createNote = await createNoteDb(req.file.originalname, dimensions.width, dimensions.height);
 	if (createNote.error != undefined) {
 		res.send(getDbErrorMessage(createNote.error));
 	} else {
@@ -62,8 +63,9 @@ files.post('/upload', checkJwt, upload.single('note'), async (req, res) => {
 files.get('/getnotes', checkJwt, async (req, res) => {
 	const { data, error } = await supabase
 		.from('point_notes')
-		.select('*')
+		.select('*, notes (*)')
 		.match({ pointid: req.query.pointid });
+
 	if (error != undefined) {
 		res.send(getDbErrorMessage(error));
 	} else {
@@ -71,10 +73,10 @@ files.get('/getnotes', checkJwt, async (req, res) => {
 	}
 });
 
-async function createNoteDb(filename) {
+const createNoteDb = async (filename, width, height) => {
 	const { data, error } = await supabase
 		.from('notes')
-		.insert([{ original_file_name: filename }]);
+		.insert([{ original_file_name: filename, width: width, height: height }]);
 	return { data: data, error: error };
 }
 

@@ -2,6 +2,7 @@ const express = require('express');
 const { checkJwt } = require('../auth/check-jwt');
 const supabase = require('../auth/supabase');
 const jwtAuthz = require('express-jwt-authz');
+const jwtDecode = require('jwt-decode');
 const {
 	getDbErrorMessage,
 	getSuccessMessage,
@@ -91,6 +92,20 @@ subjects.post(
 
 subjects.get('/getall', checkJwt, async (req, res) => {
 	const { data, error } = await supabase.from('subjects').select('*');
+	if (error != undefined) {
+		res.status(400).send(getDbErrorMessage(error));
+	} else {
+		res.status(200).send(data);
+	}
+});
+/**
+ * Title is funnt
+ * * this gets the subjects that the user doesn't take
+ * Lives in subjects but might move to users
+ */
+subjects.get('/getnew', checkJwt, async (req, res) => {
+	const jwt = jwtDecode(req.headers.authorization.substring(7));
+	const { data, error } = await supabase.rpc('get_new', {student_id: jwt.sub});
 	if (error != undefined) {
 		res.status(400).send(getDbErrorMessage(error));
 	} else {

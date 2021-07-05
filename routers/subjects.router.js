@@ -105,7 +105,9 @@ subjects.get('/getall', checkJwt, async (req, res) => {
  */
 subjects.get('/getnew', checkJwt, async (req, res) => {
 	const jwt = jwtDecode(req.headers.authorization.substring(7));
-	const { data, error } = await supabase.rpc('get_new', {student_id: jwt.sub});
+	const { data, error } = await supabase.rpc('get_new', {
+		student_id: jwt.sub,
+	});
 	if (error != undefined) {
 		res.status(400).send(getDbErrorMessage(error));
 	} else {
@@ -119,6 +121,19 @@ subjects.get('/get', checkJwt, async (req, res) => {
 		.select('*, points (*), subjects (*)')
 		.match({ subjectid: req.query.subjectid });
 
+	if (error != undefined) {
+		res.status(400).send(getDbErrorMessage(error));
+	} else {
+		res.status(200).send(data);
+	}
+});
+
+subjects.get('/getusersubjects', checkJwt, async (req, res) => {
+	const jwt = jwtDecode(req.headers.authorization.substring(7));
+	const { data, error } = await supabase
+		.from('student_subjects')
+		.select('subjects (*)')
+		.match({ studentid: jwt.sub });
 	if (error != undefined) {
 		res.status(400).send(getDbErrorMessage(error));
 	} else {

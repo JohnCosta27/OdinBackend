@@ -44,4 +44,18 @@ progress.post('/add', checkJwt, async (req, res) => {
 	}
 });
 
+progress.post('/addsingular', checkJwt, async (req, res) => {
+	const jwt = jwtDecode(req.headers.authorization.substring(7));
+	const { date, error } = await supabase
+		.from('student_points')
+		.insert([
+			{ points_id: req.body.points_id, student_id: jwt.sub, datetime: req.body.datetime },
+		]);
+	if (error != undefined) {
+		res.status(400).send(getDbErrorMessage(error));
+	} else {
+		res.status(200).send(getSuccessMessage());
+	}
+});
+
 module.exports = progress;

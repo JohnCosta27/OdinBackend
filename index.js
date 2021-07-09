@@ -28,10 +28,6 @@ app.use('/progress', progressRouter);
 app.use('/files', filesRouter);
 app.use('/users', usersRouter);
 
-apiRouter.get('/public', (req, res) => {
-	res.status(200).send({ message: 'This is a public method' });
-});
-
 /**
  * API Sync method
  * * Adds new users to the database, or updates their latest login
@@ -46,10 +42,6 @@ apiRouter.get('/sync', checkJwt, async (req, res) => {
 		.insert([{ id: jwt.sub }]);
 
 	res.status(200).send({ message: 'Synchronisation successful' });
-});
-
-apiRouter.get('/protected', checkJwt, jwtAuthz(['create:subjects'], {customScopeKey: "permissions"}), (req, res) => {
-	res.status(200).send({ message: 'This is a protected method' });
 });
 
 app.listen(serverPort, () =>

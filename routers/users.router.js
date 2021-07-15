@@ -19,7 +19,7 @@ users.post('/addsubject', checkJwt, async (req, res) => {
 	}
 });
 
-users.get('/getallusers', checkJwt, jwtAuthz(['read:users'], { customScopeKey: 'permissions' }), async (req, res) => {
+users.get('/getall', checkJwt, jwtAuthz(['read:users'], { customScopeKey: 'permissions' }), async (req, res) => {
 	const data = await getAllUsers();
 	if (data.error != undefined) {
 		res.status(400).send(data);

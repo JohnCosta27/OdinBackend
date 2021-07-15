@@ -128,19 +128,6 @@ subjects.get('/get', checkJwt, async (req, res) => {
 	}
 });
 
-subjects.get('/get_with_progress', checkJwt, async (req, res) => {
-	const { data, error } = await supabase
-		.from('topics')
-		.select('*, points (*), subjects (*)')
-		.match({ subjectid: req.query.subjectid });
-
-	if (error != undefined) {
-		res.status(400).send(getDbErrorMessage(error));
-	} else {
-		res.status(200).send(data);
-	}
-});
-
 subjects.get('/getusersubjects', checkJwt, async (req, res) => {
 	const jwt = jwtDecode(req.headers.authorization.substring(7));
 	const { data, error } = await supabase

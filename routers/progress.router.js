@@ -16,6 +16,7 @@ const progress = express.Router();
  */
 progress.get('/get', checkJwt, async (req, res) => {
 	const jwt = jwtDecode(req.headers.authorization.substring(7));
+	console.log(jwt);
 	const { data, error } = await supabase
 		.from('student_points')
 		.select('*, points (*, topics (*, subjects(*)))')

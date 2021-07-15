@@ -28,9 +28,16 @@ const getMissingParametersError = () => {
     }
 }
 
+const getRequestFailed = () => {
+    return {
+        error: 'Request failed'
+    }
+}
+
 module.exports = {
     getDbErrorMessage,
     getSuccessMessage,
     getGeneralError,
-    getMissingParametersError
+    getMissingParametersError,
+    getRequestFailed
 }

@@ -36,11 +36,13 @@ app.use('/users', usersRouter);
 apiRouter.get('/sync', checkJwt, async (req, res) => {
 	//* When user accesses the system, an account is created. If user is already created
 	//* Then there will be an error.
-	console.log(req.headers.authorization.substring(7));
 	const jwt = jwtDecode(req.headers.authorization.substring(7));
-	console.log(jwt);
 	const { data, error } = await supabase.from('users').insert([{ id: jwt.sub }]);
-	res.status(200).send({ message: 'Synchronisation successful' });
+	if (jwt.permissions.includes("role:admin")) {
+		res.status(200).send({admin: '/admin'});
+	} else {
+		res.status(200).send({user: '/dashboard'});
+	}
 });
 
 app.listen(serverPort, () => console.log(`API Server listening on port ${serverPort}`));

@@ -42,7 +42,6 @@ progress.get(
 
 progress.get('/getprogressinsubject', checkJwt, async (req, res) => {
 	const jwt = jwtDecode(req.headers.authorization.substring(7));
-	console.log(req.query.studentid);
 	const { data, error } = await supabase.rpc('get_points_from_subject_student', {
 		studentid: jwt.sub,
 		givensubjectid: req.query.subjectid,

@@ -191,8 +191,6 @@ subjects.get('/getpointrevision', checkJwt, async (req, res) => {
 		pointid: req.query.pointid,
 		studentid: jwt.sub,
 	});
-	console.log(data);
-	console.log(error);
 	if (error != undefined) {
 		res.status(400).send(getDbErrorMessage(error));
 	} else {

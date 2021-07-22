@@ -16,9 +16,25 @@ usercontent.post('/createnote', checkJwt, async (req, res) => {
 	for (let point of req.body.points) {
 		insertData.push({ point_id: point, note_id: data });
 	}
-	const { pointData, pointError } = await supabase.from('text_point_notes').insert(insertData);
+	const insertTextPoint = await insertTextPointNotes(insertData);
 
-	if (pointError != undefined) {
+	if (insertTextPoint.error != undefined) {
+		res.status(400).send(getDbErrorMessage(insertTextPoint.error));
+	} else {
+		res.status(200).send(insertTextPoint.data);
+	}
+});
+
+const insertTextPointNotes = async (insertData) => {
+	const { data, error } = await supabase.from('text_point_notes').insert(insertData);
+	return {data: data, error: error};
+}
+
+usercontent.get('/getusernotepoint', checkJwt, async (req, res) => {
+	const jwt = jwtDecode(req.headers.authorization.substring(7));
+	const { data, error } = await supabase.rpc('get_user_text_notes', { givenstudentid: jwt.sub, givenpointid: req.query.pointid });
+	console.log(data);
+	if (error != undefined) {
 		res.status(400).send(getDbErrorMessage(error));
 	} else {
 		res.status(200).send(data);

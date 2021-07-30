@@ -48,21 +48,21 @@ usercontent.get('/getusernotepoint', checkJwt, async (req, res) => {
 
 usercontent.get('/getusernotes', checkJwt, async (req, res) => {
 	const jwt = jwtDecode(req.headers.authorization.substring(7));
-	let { data, error } = await supabase
-		.from('student_notes')
-		.select('*, text_notes (*)')
-		.match({ studentid: jwt.sub });
-	data.sort(function (a, b) {
-		return (
-			new Date(a.text_notes.datetime) - new Date(b.text_notes.datetime)
-		);
+	let { data, error } = await supabase.rpc('get_all_user_text_notes', {
+		givenstudentid: jwt.sub,
 	});
-	if (data.length > 5) {
-		data = data.slice(0, 5);
-	}
 	if (error != undefined) {
 		res.status(400).send(getDbErrorMessage(error));
 	} else {
+		data.sort(function (a, b) {
+			return (
+				new Date(a.datetime) -
+				new Date(b.datetime)
+			);
+		});
+		if (data.length > 5) {
+			data = data.slice(0, 5);
+		}
 		res.status(200).send(data);
 	}
 });

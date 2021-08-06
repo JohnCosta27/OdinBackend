@@ -4,7 +4,8 @@
 	"description": "Backend for Odin",
 	"main": "index.js",
 	"scripts": {
-		"start": "nodemon index.js"
+		"start": "nodemon index.js",
+		"test": "jest"
 	},
 	"author": "JohnCosta27",
 	"license": "ISC",
@@ -24,7 +25,9 @@
 		"request": "^2.88.2"
 	},
 	"devDependencies": {
+		"jest": "^27.0.6",
 		"jwt-decode": "^3.1.2",
-		"nodemon": "^2.0.7"
+		"nodemon": "^2.0.7",
+		"supertest": "^6.1.4"
 	}
 }

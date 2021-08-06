@@ -72,8 +72,7 @@ Triangle Construction
 Loci and Construction
 Bearings
 
-Section Six — Pythagoras and
-Trigonometry
+Section Six — Pythagoras and Trigonometry
 Pythagoras' Theorem
 Trigonometry - Sin, Cos, Tan
 Trigonometry – Examples

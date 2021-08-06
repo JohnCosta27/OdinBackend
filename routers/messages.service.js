@@ -34,10 +34,17 @@ const getRequestFailed = () => {
     }
 }
 
+const getInvalidParameters = () => {
+    return {
+        error: 'Some parameters are invalid'
+    }
+}
+
 module.exports = {
     getDbErrorMessage,
     getSuccessMessage,
     getGeneralError,
     getMissingParametersError,
-    getRequestFailed
+    getRequestFailed,
+    getInvalidParameters
 }

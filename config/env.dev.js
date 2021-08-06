@@ -8,6 +8,8 @@ const serverPort = process.env.SERVER_PORT;
 const clientOriginUrl = process.env.CLIENT_ORIGIN_URL;
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
+const testClientId = process.env.ODIN_CLIENT_ID;
+const testClientSecret = process.env.ODIN_CLIENT_SECRET;
 
 if (!audience) {
     throw new Error(
@@ -45,6 +47,18 @@ if (!clientSecret) {
     )
 }
 
+if (!testClientId) {
+    throw new Error (
+        '.env is missing the definition of a ODIN_CLIENT_ID environmental variable'
+    )
+}
+
+if (!testClientSecret) {
+    throw new Error (
+        '.env is missing the definition of a ODIN_CLIENT_SECRET environmental variable'
+    )
+}
+
 const clientOrigins = ['http://localhost:4040'];
 
 module.exports = {
@@ -54,5 +68,7 @@ module.exports = {
     clientOriginUrl,
     clientOrigins,
     clientId,
-    clientSecret
+    clientSecret,
+    testClientId,
+    testClientSecret
 };

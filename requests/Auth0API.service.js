@@ -1,6 +1,6 @@
 const axios = require('axios').default;
 const { getRequestFailed } = require('../routers/messages.service');
-const { domain, clientId, clientSecret } = require('../config/env.dev');
+const { domain, clientId, clientSecret, testClientId, testClientSecret } = require('../config/env.dev');
 
 const getApiAcessToken = async () => {
 	const options = {
@@ -23,6 +23,27 @@ const getApiAcessToken = async () => {
 	}
 };
 
+const getBackendTestToken = async () => {
+	const options = {
+		method: 'POST',
+		url: `https://johncosta027.eu.auth0.com/oauth/token`,
+		headers: { 'content-type': 'application/json' },
+		data: {
+			grant_type: 'client_credentials',
+			client_id: testClientId,
+			client_secret: testClientSecret,
+			audience: `https://odin.backend/`,
+		},
+	};
+
+	try {
+		const response = await axios.request(options);
+		return response.data;
+	} catch (error) {
+		return getRequestFailed();
+	}
+}
+
 const getAllUsers = async () => {
 	const accessToken = await getApiAcessToken();
 	const options = {
@@ -36,4 +57,4 @@ const getAllUsers = async () => {
 		return getRequestFailed();
 	}
 }
-module.exports = { getApiAcessToken, getAllUsers }
+module.exports = { getApiAcessToken, getBackendTestToken, getAllUsers }

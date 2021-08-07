@@ -40,11 +40,26 @@ const getInvalidParameters = () => {
     }
 }
 
+const getAlreadyExists = () => {
+    return {
+        error: 'This record already exists'
+    }
+}
+
+const getError = (error) => {
+    return {
+        message: 'There has been a server error',
+        error: error 
+    }
+}
+
 module.exports = {
     getDbErrorMessage,
     getSuccessMessage,
     getGeneralError,
     getMissingParametersError,
     getRequestFailed,
-    getInvalidParameters
+    getInvalidParameters,
+    getAlreadyExists,
+    getError
 }

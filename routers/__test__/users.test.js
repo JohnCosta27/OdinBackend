@@ -11,8 +11,8 @@ beforeAll(async () => {
 	token = accessToken.access_token;
 });
 
-describe('POST /users/addsubject', () => {
-	const endpoint = '/users/addsubject';
+const endpoint = '/users/addsubject';
+describe(`POST ${endpoint}`, () => {
 	test('Unauthorized access, should return 401', async () => {
 		const response = await request(app).post(endpoint);
 		expect(response.statusCode).toBe(401);
@@ -26,25 +26,29 @@ describe('POST /users/addsubject', () => {
 	});
 
 	test('Authorized acess with erronous data should return 400', async () => {
-		await request(app)
+		const response = await request(app)
 			.post(endpoint)
 			.set('Authorization', 'Bearer ' + token)
 			.set('Accept', 'application/json')
-			.send({ subjectid: -1 })
-			.expect(400);
+			.send({ subjectid: -1 });
+		expect(response.statusCode).toBe(400);
 	});
 
 	test('Authorized access with correct data', async () => {
-		await request(app)
+		const response = await request(app)
 			.post(endpoint)
 			.set('Authorization', 'Bearer ' + token)
 			.set('Accept', 'application/json')
 			.send({ subjectid: '9912ccbb-c55b-4124-b322-285e45d578f0' })
 			.expect(200);
+		expect(response.statusCode).toBe(200);
 	});
 });
 
 afterAll(async () => {
 	const jwt = jwtDecode(token);
-	await supabase.from('student_subjects').delete().match({ studentid: jwt.sub });
+	await supabase
+		.from('student_subjects')
+		.delete()
+		.match({ studentid: jwt.sub });
 });

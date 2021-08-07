@@ -7,6 +7,8 @@ const {
 	getDbErrorMessage,
 	getSuccessMessage,
 	getMissingParametersError,
+	getAlreadyExists,
+	getError,
 } = require('./messages.service');
 const { checkUndefined, checkError } = require('./utilities.service');
 
@@ -15,20 +17,41 @@ const subjects = express.Router();
 subjects.post(
 	'/create',
 	checkJwt,
-	jwtAuthz(['create:subjects'], { customScopeKey: 'permissions' }),
+	jwtAuthz(['role:admin'], { customScopeKey: 'permissions' }),
 	async (req, res) => {
-		const { error } = await supabase.from('subjects').insert([
-			{
-				name: req.body.name,
-				examboard: req.body.examboard,
-				level: req.body.level,
-			},
-		]);
-
-		if (error != undefined) {
-			res.status(400).send(getDbErrorMessage(error));
+		if (
+			checkUndefined([req.body.name, req.body.examboard, req.body.level])
+		) {
+			res.status(400).send(getMissingParametersError());
 		} else {
-			res.status(200).send(getSuccessMessage());
+			const checkSubjectExists = await supabase
+				.from('subjects')
+				.select('*')
+				.match({
+					name: req.body.name,
+					examboard: req.body.examboard,
+					level: req.body.level,
+				});
+
+			if (checkSubjectExists.data.length > 0) {
+				res.status(400).send(getAlreadyExists());
+			} else {
+				const insertSubject = await supabase.from('subjects').insert([
+					{
+						name: req.body.name,
+						examboard: req.body.examboard,
+						level: req.body.level,
+					},
+				]);
+
+				if (insertSubject.error != undefined) {
+					res.status(400).send(
+						getDbErrorMessage(insertSubject.error)
+					);
+				} else {
+					res.status(200).send(getSuccessMessage());
+				}
+			}
 		}
 	}
 );
@@ -43,48 +66,70 @@ subjects.post(
 		) {
 			res.status(400).send(getMissingParametersError());
 		} else {
-			const pointsArray = req.body.points.split('\n');
-			let insertData = [];
+			try {
+				const pointsArray = req.body.points.split('\n');
+				let insertData = [];
 
-			//Topic == 1, means new topic
-			if (req.body.topic == 1) {
-				const { data, error } = await supabase.from('topics').insert([
-					{
-						name: req.body.newTopic,
-						subjectid: req.body.subject,
-					},
-				]);
-				if (error != undefined) {
-					res.status(400).send(getDbErrorMessage(error));
+				//Topic == 1, means new topic
+				if (req.body.topic == 1) {
+					if (checkUndefined([req.body.newTopic])) {
+						res.status(400).send(getMissingParametersError());
+					} else {
+						const insertNewTopic = await supabase
+							.from('topics')
+							.insert([
+								{
+									name: req.body.newTopic,
+									subjectid: req.body.subject,
+								},
+							]);
+						if (insertNewTopic.error != undefined) {
+							res.status(400).send(
+								getDbErrorMessage(insertNewTopic.error)
+							);
+						} else {
+							for (let point of pointsArray) {
+								insertData.push({
+									topicid: insertNewTopic.data[0].id,
+									name: point,
+								});
+							}
+
+							const insertPoints = await supabase
+								.from('points')
+								.insert(insertData);
+
+							if (insertPoints.error != undefined) {
+								res.status(400).send(
+									getDbErrorMessage(insertPoints.error)
+								);
+							} else {
+								res.status(200).send(getSuccessMessage());
+							}
+						}
+					}
 				} else {
 					for (let point of pointsArray) {
-						insertData.push({ topicid: data[0].id, name: point });
+						insertData.push({
+							topicid: req.body.topic,
+							name: point,
+						});
 					}
-
-					const { data2, error2 } = await supabase
+					
+					const insertPoints = await supabase
 						.from('points')
 						.insert(insertData);
 
-					if (error2 != undefined) {
-						res.status(400).send(getDbErrorMessage(error));
+					if (insertPoints.error != undefined) {
+						res.status(400).send(
+							getDbErrorMessage(insertPoints.error)
+						);
 					} else {
 						res.status(200).send(getSuccessMessage());
 					}
 				}
-			} else {
-				for (let point of pointsArray) {
-					insertData.push({ topicid: req.body.topic, name: point });
-				}
-
-				const { data, error } = await supabase
-					.from('points')
-					.insert(insertData);
-
-				if (error != undefined) {
-					res.status(400).send(getDbErrorMessage(error));
-				} else {
-					res.status(200).send(getSuccessMessage());
-				}
+			} catch (error) {
+				res.status(400).send(getError(error));
 			}
 		}
 	}

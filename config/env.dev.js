@@ -1,6 +1,6 @@
 const dotenv = require('dotenv');
 
-dotenv.config({path: '/home/johnc/Code/Odin/backend/.env'});
+dotenv.config({path: '/home/johnc/Code/Odin/OdinBackend/.env'});
 
 const audience = process.env.AUTH0_AUDIENCE;
 const domain = process.env.AUTH0_DOMAIN;

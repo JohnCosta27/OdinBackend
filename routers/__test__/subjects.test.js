@@ -146,6 +146,41 @@ describe(`POST ${createPointsEndpoint}`, () => {
 	});
 });
 
+const getAllEndpoint = '/subjects/getall';
+describe(`GET ${getAllEndpoint}`, () => {
+	test('Unauthorized access (no token), should return 400', async () => {
+		await request(app).get(getAllEndpoint).expect(400);
+	});
+
+	test('Authorized acess', async () => {
+		await request(app)
+			.get(getAllEndpoint)
+			.set('Authorization', 'Bearer ' + token)
+			.expect(200);
+	});
+});
+
+const getNewEndpoint = '/subjects/getnew';
+describe(`GET ${getNewEndpoint}`, () => {
+	test('Unauthorized access (no token), should return 400', async () => {
+		await request(app).get(getNewEndpoint).expect(400);
+	});
+
+	test('Authorized access', async () => {
+		const addSubject = await supabase
+			.from('student_subjects')
+			.insert([{ subjectid: '9912ccbb-c55b-4124-b322-285e45d578f0' }]);
+		expect(addSubject.error).toBe(null);
+
+		const newSubjects = await request(app).get(getNewEndpoint);
+
+		console.log(newSubjects);
+		for (let subject of newSubjects) {
+			expect(subject.id).toBe(!'9912ccbb-c55b-4124-b322-285e45d578f0');
+		}
+	});
+});
+
 afterAll(async () => {
 	await supabase
 		.from('subjects')

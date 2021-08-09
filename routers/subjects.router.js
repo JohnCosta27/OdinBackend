@@ -144,7 +144,7 @@ subjects.get('/getall', checkJwt, async (req, res) => {
 	}
 });
 /**
- * Title is funnt
+ * Title is funny
  * * this gets the subjects that the user doesn't take
  * Lives in subjects but might move to users
  */

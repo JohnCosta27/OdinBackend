@@ -61,6 +61,7 @@ subjects.post(
 	checkJwt,
 	jwtAuthz(['create:subjectpoints'], { customScopeKey: 'permissions' }),
 	async (req, res) => {
+		console.log(req.body);
 		if (
 			checkUndefined([req.body.topic, req.body.subject, req.body.points])
 		) {
@@ -75,6 +76,7 @@ subjects.post(
 					if (checkUndefined([req.body.newTopic])) {
 						res.status(400).send(getMissingParametersError());
 					} else {
+						console.log(req.body.subject);
 						const insertNewTopic = await supabase
 							.from('topics')
 							.insert([
@@ -104,7 +106,7 @@ subjects.post(
 									getDbErrorMessage(insertPoints.error)
 								);
 							} else {
-								res.status(200).send(getSuccessMessage());
+								res.status(200).send(insertNewTopic.data);
 							}
 						}
 					}

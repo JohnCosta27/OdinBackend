@@ -10,12 +10,29 @@ const jwtDecode = require('jwt-decode');
 let token;
 let opToken;
 let subjectid;
+let topicid;
+let pointid;
 
 beforeAll(async () => {
 	const accessToken = await getBackendTestToken();
 	const opAccessToken = await getBackendTestOpToken();
 	token = accessToken.access_token;
 	opToken = opAccessToken.access_token;
+
+	const newSubject = await supabase
+		.from('subjects')
+		.insert([{ name: 'TestSubject', level: 'GCSE', examboard: 'AQA' }]);
+	subjectid = newSubject.data[0].id;
+
+	const newTopic = await supabase
+		.from('topics')
+		.insert([{ name: 'Test Topic', subjectid: subjectid }]);
+	topicid = newTopic.data[0].id;
+
+	const newPoint = await supabase
+		.from('points')
+		.insert([{ name: 'Test Point', topicid: topicid }]);
+	pointid = newPoint.data[0].id;
 });
 
 const createEndpoint = '/subjects/create';
@@ -54,10 +71,7 @@ describe(`POST ${createEndpoint}`, () => {
 			.set('Authorization', 'Bearer ' + opToken)
 			.set('Accept', 'application/json')
 			.send({ name: 'Test', examboard: 'Pearson', level: 'A-level' })
-			.end((err, res) => {
-				subjectid = res.text[0].id;
-				expect(res.statusCode).toBe(200);
-			});
+			.expect(200);
 	});
 });
 
@@ -97,7 +111,7 @@ describe(`POST ${createPointsEndpoint}`, () => {
 			.post(createPointsEndpoint)
 			.set('Authorization', 'Bearer ' + opToken)
 			.send({
-				subject: '9912ccbb-c55b-4124-b322-285e45d578f0',
+				subject: subjectid,
 				topic: 1,
 				points: 'This is a test',
 			})
@@ -106,16 +120,18 @@ describe(`POST ${createPointsEndpoint}`, () => {
 			.expect(400);
 	});
 
-	test('Authorized token, existing topic and new point, should return 200', () => {
+	test('Authorized token, new topic and new point, should return 200', () => {
 		request(app)
 			.post(createPointsEndpoint)
 			.set('Authorization', 'Bearer ' + opToken)
-			.send({
-				subject: '9912ccbb-c55b-4124-b322-285e45d578f0',
-				topic: '308d4d9c-3173-405b-9350-1ae6a66bedeb',
-				points: 'This is a test',
-			})
 			.set('Accept', 'application/json')
+			.set('Content-Type', 'application/json')
+			.send({
+				subject: subjectid,
+				topic: 1,
+				newTopic: 'Test topic',
+				points: 'This is a test #4',
+			})
 			.expect(200);
 	});
 
@@ -124,8 +140,8 @@ describe(`POST ${createPointsEndpoint}`, () => {
 			.post(createPointsEndpoint)
 			.set('Authorization', 'Bearer ' + opToken)
 			.send({
-				subject: '9912ccbb-c55b-4124-b322-285e45d578f0',
-				topic: '308d4d9c-3173-405b-9350-1ae6a66bedeb',
+				subject: subjectid,
+				topic: topicid,
 				points: 'This is a test #2\nThis is a test #3',
 			})
 			.set('Content-Type', 'application/json')
@@ -133,18 +149,16 @@ describe(`POST ${createPointsEndpoint}`, () => {
 			.expect(200);
 	});
 
-	test('Authorized token, new topic and new point, should return 200', () => {
+	test('Authorized token, existing topic and new point, should return 200', () => {
 		request(app)
 			.post(createPointsEndpoint)
 			.set('Authorization', 'Bearer ' + opToken)
 			.send({
-				subject: '9912ccbb-c55b-4124-b322-285e45d578f0',
-				topic: 1,
-				newTopic: 'Test topic',
-				points: 'This is a test #4',
+				subject: subjectid,
+				topic: topicid,
+				points: 'This is a test',
 			})
 			.set('Accept', 'application/json')
-			.set('Content-Type', 'application/json')
 			.expect(200);
 	});
 });
@@ -165,27 +179,15 @@ describe(`GET ${getAllEndpoint}`, () => {
 
 const getNewEndpoint = '/subjects/getnew';
 describe(`GET ${getNewEndpoint}`, () => {
-	test('Unauthorized access (no token), should return 401', async () => {
-		await request(app).get(getNewEndpoint).expect(401);
+	test('Unauthorized access (no token), should return 401', () => {
+		request(app).get(getNewEndpoint).expect(401);
 	});
 
-	test('Authorized access', async () => {
-		const jwt = jwtDecode(token);
-		const addSubject = await supabase.from('student_subjects').insert([
-			{
-				studentid: jwt.sub,
-				subjectid: '9912ccbb-c55b-4124-b322-285e45d578f0',
-			},
-		]);
-		expect(addSubject.error).toBe(null);
-
-		const newSubjects = await request(app)
+	test('Authorized access', () => {
+		request(app)
 			.get(getNewEndpoint)
-			.set('Authorization', 'Bearer ' + token);
-
-		for (let subject of newSubjects.body) {
-			expect(subject.id).not.toBe('9912ccbb-c55b-4124-b322-285e45d578f0');
-		}
+			.set('Authorization', 'Bearer ' + token)
+			.expect(200);
 	});
 });
 
@@ -199,7 +201,7 @@ describe(`GET ${getSubjectEndpoint}`, () => {
 		const response = await request(app)
 			.get(getSubjectEndpoint)
 			.set('Authorization', 'Bearer ' + token)
-			.query({ subjectid: '9912ccbb-c55b-4124-b322-285e45d578f0' })
+			.query({ subjectid: subjectid })
 			.expect(200);
 
 		expect(response.body.topics).not.toBe(null);
@@ -209,33 +211,28 @@ describe(`GET ${getSubjectEndpoint}`, () => {
 
 const getUserSubjectsEndpoint = '/subjects/getusersubjects';
 describe(`GET ${getUserSubjectsEndpoint}`, () => {
-	test('Unauthorized access (no token), should return 401', async () => {
-		await request(app).get(getUserSubjectsEndpoint).expect(401);
+	test('Unauthorized access (no token), should return 401', () => {
+		request(app).get(getUserSubjectsEndpoint).expect(401);
 	});
 
-	test('Authorized access', async () => {
-		const response = await request(app)
+	test('Authorized access', () => {
+		request(app)
 			.get(getUserSubjectsEndpoint)
 			.set('Authorization', 'Bearer ' + token)
 			.expect(200);
-
-		expect(response.body.length).toBe(1);
-		expect(response.body[0].subjects.id).toBe(
-			'9912ccbb-c55b-4124-b322-285e45d578f0'
-		);
 	});
 });
 
 const getAllTopicsEndpoint = '/subjects/getalltopics';
 describe(`GET ${getAllTopicsEndpoint}`, () => {
-	test('Unauthorized access (no token), should return 401', async () => {
-		await request(app).get(getAllTopicsEndpoint).expect(401);
+	test('Unauthorized access (no token), should return 401', () => {
+		request(app).get(getAllTopicsEndpoint).expect(401);
 	});
 
 	test('Authorized access', () => {
 		request(app)
 			.get(getAllTopicsEndpoint)
-			.query({ subjectid: '9912ccbb-c55b-4124-b322-285e45d578f0' })
+			.query({ subjectid: subjectid })
 			.set('Authorization', 'Bearer ' + token)
 			.expect(200);
 	});
@@ -250,7 +247,7 @@ describe(`GET ${getPointsEndpoint}`, () => {
 	test('Authorized access', async () => {
 		const response = await request(app)
 			.get(getPointsEndpoint)
-			.query({ topicid: '308d4d9c-3173-405b-9350-1ae6a66bedeb' })
+			.query({ topicid: topicid })
 			.set('Authorization', 'Bearer ' + token)
 			.expect(200);
 		expect(response.body.length).not.toBe(0);
@@ -266,7 +263,7 @@ describe(`GET ${getPointEndpoint}`, () => {
 	test('Authorized access', async () => {
 		const response = await request(app)
 			.get(getPointEndpoint)
-			.query({ pointid: '04ea23bb-ae5f-4e1d-bfb1-1d88eb67f9a8' })
+			.query({ pointid: pointid })
 			.set('Authorization', 'Bearer ' + token)
 			.expect(200);
 		expect(response.body.length).not.toBe(0);
@@ -282,7 +279,7 @@ describe(`GET ${getPointRevisionEndpoint}`, () => {
 	test('Authorized access', async () => {
 		const response = await request(app)
 			.get(getPointRevisionEndpoint)
-			.query({ pointid: '04ea23bb-ae5f-4e1d-bfb1-1d88eb67f9a8' })
+			.query({ pointid: pointid })
 			.set('Authorization', 'Bearer ' + token)
 			.expect(200);
 		expect(response.body.length).toBe(0);
@@ -291,11 +288,15 @@ describe(`GET ${getPointRevisionEndpoint}`, () => {
 
 afterAll(async () => {
 	const jwt = jwtDecode(token);
-	await supabase.from('subjects').delete().eq('name', 'Test');
-	supabase.from('points').delete().eq('name', 'This is a test');
-	supabase.from('points').delete().eq('name', 'This is a test #2');
-	supabase.from('points').delete().eq('name', 'This is a test #3');
-	supabase.from('points').delete().eq('name', 'This is a test #4');
-	supabase.from('topics').delete().eq('name', 'Test topic');
+	await supabase.from('points').delete().eq('name', 'This is a test');
+	await supabase.from('points').delete().eq('name', 'This is a test #2');
+	await supabase.from('points').delete().eq('name', 'This is a test #3');
+	await supabase.from('points').delete().eq('name', 'This is a test #4');
+	await supabase.from('points').delete().eq('name', 'Test Point');
+	await supabase.from('topics').delete().eq('name', 'Test Topic');
+	await supabase.from('points').delete().match({ id: pointid });
+	await supabase.from('topics').delete().match({ id: topicid });
+	await supabase.from('subjects').delete().match({ id: subjectid });
+	await supabase.from('subjects').delete().match({ name: 'TestSubject' });
 	await supabase.from('student_subjects').delete().eq('studentid', jwt.sub);
 });

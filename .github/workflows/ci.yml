@@ -18,10 +18,10 @@ jobs:
               env:
                   SERVER_PORT: ${{secrets.SERVER_PORT}}
 
-            - run: 'echo "CLIENT_ORIGIN=$CLIENT_ORIGIN" >> .env'
+            - run: 'echo "CLIENT_ORIGIN_URL=$CLIENT_ORIGIN_URL" >> .env'
               shell: bash
               env:
-                  CLIENT_ORIGIN: ${{secrets.CLIENT_ORIGIN}}
+                  CLIENT_ORIGIN_URL: ${{secrets.CLIENT_ORIGIN_URL}}
 
             - run: 'echo "AUTH0_AUDIENCE=$AUTH0_AUDIENCE" >> .env'
               shell: bash

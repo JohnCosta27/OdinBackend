@@ -84,6 +84,7 @@ jobs:
                   USE_SAVED: ${{secrets.USE_SAVED}}
 
             - run: 'cat .env'
+            - run: 'realpath .env'
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v2

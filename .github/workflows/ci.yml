@@ -10,8 +10,9 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
+
             - run: touch .env
-            - run: echo SERVER_PORT=${{ secrets.ODINBACKEND_SERVER_PORT }} >> .env
+            - run: 'echo SERVER_PORT=${{ secrets.ODINBACKEND_SERVER_PORT }} >> .env'
             - run: echo CLIENT_ORIGIN=${{ secrets.ODINBACKEND_CLIENT_ORIGIN }} >> .env
             - run: echo AUTH0_AUDIENCE=${{ secrets.ODINBACKEND_AUTH0_AUDIENCE }} >> .env
             - run: echo AUTH0_DOMAIN=${{ secrets.ODINBACKEND_AUTH0_DOMAIN }} >> .env

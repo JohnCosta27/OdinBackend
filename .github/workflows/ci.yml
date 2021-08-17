@@ -10,7 +10,22 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-            - run: echo "HelloWorrld"
+            - run: touch .env
+            - run: echo SERVER_PORT=${{ secrets.ODINBACKEND_SERVER_PORT }} >> .env
+            - run: echo CLIENT_ORIGIN=${{ secrets.ODINBACKEND_CLIENT_ORIGIN }} >> .env
+            - run: echo AUTH0_AUDIENCE=${{ secrets.ODINBACKEND_AUTH0_AUDIENCE }} >> .env
+            - run: echo AUTH0_DOMAIN=${{ secrets.ODINBACKEND_AUTH0_DOMAIN }} >> .env
+            - run: echo SUPABASE_KEY=${{ secrets.ODINBACKEND_SUPABASE_KEY }} >> .env
+            - run: echo CLIENT_ID=${{ secrets.ODINBACKEND_CLIENT_ID }} >> .env
+            - run: echo CLIENT_SECRET=${{ secrets.ODINBACKEND_CLIENT_SECRET }} >> .env
+            - run: echo ODIN_CLIENT_ID=${{ secrets.ODINBACKEND_ODIN_CLIENT_ID }} >> .env
+            - run: echo ODIN_CLIENT_SECRET=${{ secrets.ODINBACKEND_ODIN_CLIENT_SECRET }} >> .env
+            - run: echo ODIN_OP_CLIENT_ID=${{ secrets.ODINBACKEND_ODIN_OP_CLIENT_ID }} >> .env
+            - run: echo ODIN_OP_CLIENT_SECRET=${{ secrets.ODINBACKEND_ODIN_OP_CLIENT_SECRET }} >> .env
+            - run: echo TEST_TOKEN=${{ secrets.ODINBACKEND_TEST_TOKEN }} >> .env
+            - run: echo OP_TEST_TOKEN=${{ secrets.ODINBACKEND_OP_TEST_TOKEND }} >> .env
+            - run: echo USE_SAVED=${{ secrets.ODINBACKEND_USE_SAVED }} >> .env
+            - run: cat .env
 
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v2

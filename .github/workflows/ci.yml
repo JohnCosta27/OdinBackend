@@ -13,72 +13,72 @@ jobs:
 
             - run: touch .env
 
-            - run: 'echo "SERVER_PORT=$SERVER_PORT" > .env'
+            - run: 'echo "SERVER_PORT=$SERVER_PORT" >> .env'
               shell: bash
               env:
                   SERVER_PORT: ${{secrets.SERVER_PORT}}
 
-            - run: 'echo "CLIENT_ORIGIN=$CLIENT_ORIGIN" > .env'
+            - run: 'echo "CLIENT_ORIGIN=$CLIENT_ORIGIN" >> .env'
               shell: bash
               env:
                   CLIENT_ORIGIN: ${{secrets.CLIENT_ORIGIN}}
 
-            - run: 'echo "AUTH0_AUDIENCE=$AUTH0_AUDIENCE" > .env'
+            - run: 'echo "AUTH0_AUDIENCE=$AUTH0_AUDIENCE" >> .env'
               shell: bash
               env:
                   AUTH0_AUDIENCE: ${{secrets.AUTH0_AUDIENCE}}
 
-            - run: 'echo "AUTH0_DOMAIN=$AUTH0_DOMAIN" > .env'
+            - run: 'echo "AUTH0_DOMAIN=$AUTH0_DOMAIN" >> .env'
               shell: bash
               env:
                   AUTH0_DOMAIN: ${{secrets.AUTH0_DOMAIN}}
 
-            - run: 'echo "SUPABASE_KEY=$SUPABASE_KEY" > .env'
+            - run: 'echo "SUPABASE_KEY=$SUPABASE_KEY" >> .env'
               shell: bash
               env:
                   SUPABASE_KEY: ${{secrets.SUPABASE_KEY}}
 
-            - run: 'echo "CLIENT_ID=$CLIENT_ID" > .env'
+            - run: 'echo "CLIENT_ID=$CLIENT_ID" >> .env'
               shell: bash
               env:
                   CLIENT_ID: ${{secrets.CLIENT_ID}}
 
-            - run: 'echo "CLIENT_SECRET=$CLIENT_SECRET" > .env'
+            - run: 'echo "CLIENT_SECRET=$CLIENT_SECRET" >> .env'
               shell: bash
               env:
                   CLIENT_SECRET: ${{secrets.CLIENT_SECRET}}
 
-            - run: 'echo "ODIN_CLIENT_ID=$ODIN_CLIENT_ID" > .env'
+            - run: 'echo "ODIN_CLIENT_ID=$ODIN_CLIENT_ID" >> .env'
               shell: bash
               env:
                   ODIN_CLIENT_ID: ${{secrets.ODIN_CLIENT_ID}}
 
-            - run: 'echo "ODIN_CLIENT_SECRET=$ODIN_CLIENT_SECRET" > .env'
+            - run: 'echo "ODIN_CLIENT_SECRET=$ODIN_CLIENT_SECRET" >> .env'
               shell: bash
               env:
                   ODIN_CLIENT_SECRET: ${{secrets.ODIN_CLIENT_SECRET}}
 
-            - run: 'echo "ODIN_OP_CLIENT_ID=$ODIN_OP_CLIENT_ID" > .env'
+            - run: 'echo "ODIN_OP_CLIENT_ID=$ODIN_OP_CLIENT_ID" >> .env'
               shell: bash
               env:
                   ODIN_OP_CLIENT_ID: ${{secrets.ODIN_OP_CLIENT_ID}}
 
-            - run: 'echo "ODIN_OP_CLIENT_SECRET=$ODIN_OP_CLIENT_SECRET" > .env'
+            - run: 'echo "ODIN_OP_CLIENT_SECRET=$ODIN_OP_CLIENT_SECRET" >> .env'
               shell: bash
               env:
                   ODIN_OP_CLIENT_SECRET: ${{secrets.ODIN_OP_CLIENT_SECRET}}
 
-            - run: 'echo "TEST_TOKEN=$TEST_TOKEN" > .env'
+            - run: 'echo "TEST_TOKEN=$TEST_TOKEN" >> .env'
               shell: bash
               env:
                   TEST_TOKEN: ${{secrets.TEST_TOKEN}}
 
-            - run: 'echo "OP_TEST_TOKEN=$OP_TEST_TOKEN" > .env'
+            - run: 'echo "OP_TEST_TOKEN=$OP_TEST_TOKEN" >> .env'
               shell: bash
               env:
                   OP_TEST_TOKEN: ${{secrets.OP_TEST_TOKEN}}
 
-            - run: 'echo "USE_SAVED=$USE_SAVED" > .env'
+            - run: 'echo "USE_SAVED=$USE_SAVED" >> .env'
               shell: bash
               env:
                   USE_SAVED: ${{secrets.USE_SAVED}}

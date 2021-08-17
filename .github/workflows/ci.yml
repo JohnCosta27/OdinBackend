@@ -1,0 +1,60 @@
+name: ci
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+
+  docker:
+  
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create .env file
+      - uses: SpicyPizza/create-envfile@v1.1
+        with:
+          envkey_SERVER_PORT: ${{ secrets.ODINBACKEND_SERVER_PORT }}
+          envkey_CLIENT_ORIGIN: ${{ secrets.ODINBACKEND_CLIENT_ORIGIN }}
+          envkey_AUTH0_AUDIENCE: ${{ secrets.ODINBACKEND_AUTH0_AUDIENCE }}
+          envkey_AUTH0_DOMAIN: ${{ secrets.ODINBACKEND_AUTH0_DOMAIN }}
+          envkey_SUPABASE_KEY: ${{ secrets.ODINBACKEND_SUPABASE_KEY }}
+          envkey_CLIENT_ID: ${{ secrets.ODINBACKEND_CLIENT_ID }}
+          envkey_CLIENT_SECRET: ${{ secrets.ODINBACKEND_CLIENT_SECRET }}
+          envkey_ODIN_CLIENT_ID: ${{ secrets.ODINBACKEND_ODIN_CLIENT_ID }}
+          envkey_ODIN_CLIENT_SECRET: ${{ secrets.ODINBACKEND_ODIN_CLIENT_SECRET }}
+          envkey_ODIN_OP_CLIENT_ID: ${{ secrets.ODINBACKEND_ODIN_OP_CLIENT_ID }}
+          envkey_ODIN_OP_CLIENT_SECRET: ${{ secrets.ODINBACKEND_ODIN_OP_CLIENT_SECRET }}
+          envkey_TEST_TOKEN: ${{ secrets.ODINBACKEND_TEST_TOKEN }}
+          envkey_OP_TEST_TOKEN: ${{ secrets.ODINBACKEND_OP_TEST_TOKEND }}
+          envkey_USE_SAVED: ${{ secrets.ODINBACKEND_USE_SAVED }}
+          directory: .
+          file_name: .env
+      
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - run: npm ci
+      - run: npm run test
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      -
+        name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: johncosta27/odin-backend:latest

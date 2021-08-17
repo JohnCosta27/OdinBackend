@@ -83,6 +83,8 @@ jobs:
               env:
                   USE_SAVED: ${{secrets.USE_SAVED}}
 
+            - run: 'cat .env'
+
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v2
               with:

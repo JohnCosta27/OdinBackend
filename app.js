@@ -40,7 +40,7 @@ app.use('/usercontent', usercontentRouter);
  */
 
 app.get('/hello', (req, res) => {
-	res.status(200).send({ hello: 'world' });
+	res.status(200).send({ hello: 'world #2' });
 });
 
 apiRouter.get('/sync', checkJwt, async (req, res) => {

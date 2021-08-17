@@ -38,6 +38,11 @@ app.use('/usercontent', usercontentRouter);
  * * Adds new users to the database, or updates their latest login
  * TODO: Login times in database (later down the line)
  */
+
+app.get('/hello', (req, res) => {
+	res.status(200).send({ hello: 'world' });
+});
+
 apiRouter.get('/sync', checkJwt, async (req, res) => {
 	//* When user accesses the system, an account is created. If user is already created
 	//* Then there will be an error.

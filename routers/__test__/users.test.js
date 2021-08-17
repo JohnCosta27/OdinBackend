@@ -13,42 +13,37 @@ beforeAll(async () => {
 
 const endpoint = '/users/addsubject';
 describe(`POST ${endpoint}`, () => {
-	test('Unauthorized access, should return 401', async () => {
-		const response = await request(app).post(endpoint);
-		expect(response.statusCode).toBe(401);
+	test('Unauthorized access, should return 401', () => {
+		request(app).post(endpoint).expect(401);
 	});
 
-	test('Authorized access with no body', async () => {
-		const response = await request(app)
+	test('Authorized access with no body', () => {
+		request(app)
 			.post(endpoint)
-			.set('Authorization', 'Bearer ' + token);
-		expect(response.statusCode).toBe(400);
+			.set('Authorization', 'Bearer ' + token)
+			.expect(400);
 	});
 
-	test('Authorized acess with erronous data should return 400', async () => {
-		const response = await request(app)
+	test('Authorized acess with erronous data should return 400', () => {
+		request(app)
 			.post(endpoint)
 			.set('Authorization', 'Bearer ' + token)
 			.set('Accept', 'application/json')
-			.send({ subjectid: -1 });
-		expect(response.statusCode).toBe(400);
+			.send({ subjectid: -1 })
+			.expect(400);
 	});
 
-	test('Authorized access with correct data', async () => {
-		const response = await request(app)
+	test('Authorized access with correct data', () => {
+		request(app)
 			.post(endpoint)
 			.set('Authorization', 'Bearer ' + token)
 			.set('Accept', 'application/json')
 			.send({ subjectid: '9912ccbb-c55b-4124-b322-285e45d578f0' })
 			.expect(200);
-		expect(response.statusCode).toBe(200);
 	});
 });
 
-afterAll(async () => {
+afterAll(() => {
 	const jwt = jwtDecode(token);
-	await supabase
-		.from('student_subjects')
-		.delete()
-		.match({ studentid: jwt.sub });
+	supabase.from('student_subjects').delete().match({ studentid: jwt.sub });
 });

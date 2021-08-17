@@ -3,7 +3,12 @@ const { checkJwt } = require('../auth/check-jwt');
 const supabase = require('../auth/supabase');
 const jwtAuthz = require('express-jwt-authz');
 const jwtDecode = require('jwt-decode');
-const { getDbErrorMessage, getSuccessMessage, getMissingParametersError } = require('./messages.service');
+const {
+	getDbErrorMessage,
+	getSuccessMessage,
+	getMissingParametersError,
+	getError,
+} = require('./messages.service');
 const { checkUndefined, checkError } = require('./utilities.service');
 const progress = express.Router();
 
@@ -42,10 +47,13 @@ progress.get(
 
 progress.get('/getprogressinsubject', checkJwt, async (req, res) => {
 	const jwt = jwtDecode(req.headers.authorization.substring(7));
-	const { data, error } = await supabase.rpc('get_points_from_subject_student', {
-		studentid: jwt.sub,
-		givensubjectid: req.query.subjectid,
-	});
+	const { data, error } = await supabase.rpc(
+		'get_points_from_subject_student',
+		{
+			studentid: jwt.sub,
+			givensubjectid: req.query.subjectid,
+		}
+	);
 
 	if (error != undefined) {
 		res.status(400).send(getDbErrorMessage(error));
@@ -66,22 +74,28 @@ progress.get('/getprogressinsubject', checkJwt, async (req, res) => {
 			}
 		}
 
-		res.status(200).send(returnData);
+		res.status(200).send(getSuccessMessage());
 	}
 });
 
 progress.post('/add', checkJwt, async (req, res) => {
 	let points = [];
 	const jwt = jwtDecode(req.headers.authorization.substring(7));
-	for (let point of req.body.points) {
-		points.push({ points_id: point, student_id: jwt.sub });
-	}
+	try {
+		for (let point of req.body.points) {
+			points.push({ points_id: point, student_id: jwt.sub });
+		}
 
-	const { data, error } = await supabase.from('student_points').insert(points);
-	if (error != undefined) {
-		res.status(400).send(getDbErrorMessage(error));
-	} else {
-		res.status(200).send(getSuccessMessage());
+		const { data, error } = await supabase
+			.from('student_points')
+			.insert(points);
+		if (error != undefined) {
+			res.status(400).send(getDbErrorMessage(error));
+		} else {
+			res.status(200).send(data);
+		}
+	} catch (error) {
+		res.status(400).send(getError(error));
 	}
 });
 

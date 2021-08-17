@@ -8,6 +8,9 @@ const {
 	testClientSecret,
 	testClientOpId,
 	testClientOpSecret,
+	useSavedToken,
+	testToken,
+	opTestToken,
 } = require('../config/env.dev');
 
 const getApiAcessToken = async () => {
@@ -32,6 +35,10 @@ const getApiAcessToken = async () => {
 };
 
 const getBackendTestToken = async () => {
+	if (useSavedToken == 1) {
+		return JSON.parse(testToken);
+	}
+
 	const options = {
 		method: 'POST',
 		url: `https://johncosta027.eu.auth0.com/oauth/token`,
@@ -53,6 +60,10 @@ const getBackendTestToken = async () => {
 };
 
 const getBackendTestOpToken = async () => {
+	if (useSavedToken == 1) {
+		return JSON.parse(opTestToken);
+	}
+
 	const options = {
 		method: 'POST',
 		url: `https://johncosta027.eu.auth0.com/oauth/token`,

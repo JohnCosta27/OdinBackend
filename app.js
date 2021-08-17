@@ -6,7 +6,10 @@ const { checkJwt } = require('./auth/check-jwt');
 const jwtDecode = require('jwt-decode');
 const jwtAuthz = require('express-jwt-authz');
 const supabase = require('./auth/supabase');
-
+const {
+	getDbErrorMessage,
+	getSuccessMessage,
+} = require('./routers/messages.service');
 const subjectRouter = require('./routers/subjects.router');
 const progressRouter = require('./routers/progress.router');
 const filesRouter = require('./routers/files.router');
@@ -28,7 +31,7 @@ app.use('/subjects', subjectRouter);
 app.use('/progress', progressRouter);
 app.use('/files', filesRouter);
 app.use('/users', usersRouter);
-app.use('/usercontent', usercontentRouter)
+app.use('/usercontent', usercontentRouter);
 
 /**
  * API Sync method
@@ -36,14 +39,13 @@ app.use('/usercontent', usercontentRouter)
  * TODO: Login times in database (later down the line)
  */
 apiRouter.get('/sync', checkJwt, async (req, res) => {
-	console.log("Hello")
 	//* When user accesses the system, an account is created. If user is already created
 	//* Then there will be an error.
 	const jwt = jwtDecode(req.headers.authorization.substring(7));
-	const { data, error } = await supabase.from('users').insert([{ id: jwt.sub }]);
-	console.log(data);
-	console.log(error);
-	res.status(200).send({status: 'Sync complete'});
+	const { data, error } = await supabase
+		.from('users')
+		.insert([{ id: jwt.sub }]);
+	res.status(200).send(getSuccessMessage());
 });
 
 module.exports = app;

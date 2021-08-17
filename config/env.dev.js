@@ -1,6 +1,6 @@
 const dotenv = require('dotenv');
 
-dotenv.config({path: '/home/johnc/Code/Odin/OdinBackend/.env'});
+dotenv.config({path: '/home/johnc/Code/Odin/backend/.env'});
 
 const audience = process.env.AUTH0_AUDIENCE;
 const domain = process.env.AUTH0_DOMAIN;
@@ -12,6 +12,9 @@ const testClientId = process.env.ODIN_CLIENT_ID;
 const testClientSecret = process.env.ODIN_CLIENT_SECRET;
 const testClientOpId = process.env.ODIN_OP_CLIENT_ID;
 const testClientOpSecret = process.env.ODIN_OP_CLIENT_SECRET;
+const useSavedToken = process.env.USE_SAVED;
+const testToken = process.env.TEST_TOKEN;
+const opTestToken = process.env.OP_TEST_TOKEN;
 
 if (!audience) {
     throw new Error(
@@ -73,6 +76,24 @@ if (!testClientOpSecret) {
     )
 }
 
+if (!useSavedToken) {
+    throw new Error(
+        '.env is missing the definition of an USE_SAVED environmental variable'
+    )
+}
+
+if (!testToken) {
+    throw new Error(
+        '.env is missing the definition of an TEST_TOKEN environmental variable'
+    )
+}
+
+if (!opTestToken) {
+    throw new Error(
+        '.env is missing the definition of an OP_TEST_TOKEN environmental variable'
+    )
+}
+
 const clientOrigins = ['http://localhost:4040'];
 
 module.exports = {
@@ -86,5 +107,8 @@ module.exports = {
     testClientId,
     testClientSecret,
     testClientOpId,
-    testClientOpSecret
+    testClientOpSecret,
+    useSavedToken,
+    testToken,
+    opTestToken
 };

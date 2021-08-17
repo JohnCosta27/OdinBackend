@@ -49,7 +49,7 @@ subjects.post(
 						getDbErrorMessage(insertSubject.error)
 					);
 				} else {
-					res.status(200).send(getSuccessMessage());
+					res.status(200).send(insertSubject.data);
 				}
 			}
 		}
@@ -115,7 +115,7 @@ subjects.post(
 							name: point,
 						});
 					}
-					
+
 					const insertPoints = await supabase
 						.from('points')
 						.insert(insertData);

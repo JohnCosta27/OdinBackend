@@ -11,8 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Create .env file
       - uses: SpicyPizza/create-envfile@v1.1
+      - name: Create .env file
         with:
           envkey_SERVER_PORT: ${{ secrets.ODINBACKEND_SERVER_PORT }}
           envkey_CLIENT_ORIGIN: ${{ secrets.ODINBACKEND_CLIENT_ORIGIN }}

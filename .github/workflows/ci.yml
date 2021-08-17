@@ -16,22 +16,8 @@ jobs:
       
       - name: Create env file
       - run: |
-        touch .env
-        echo SERVER_PORT=${{ secrets.ODINBACKEND_SERVER_PORT }} >> .env
-        echo CLIENT_ORIGIN=${{ secrets.ODINBACKEND_CLIENT_ORIGIN }} >> .env
-        echo AUTH0_AUDIENCE=${{ secrets.ODINBACKEND_AUTH0_AUDIENCE }} >> .env
-        echo AUTH0_DOMAIN=${{ secrets.ODINBACKEND_AUTH0_DOMAIN }} >> .env
-        echo SUPABASE_KEY=${{ secrets.ODINBACKEND_SUPABASE_KEY }} >> .env
-        echo CLIENT_ID=${{ secrets.ODINBACKEND_CLIENT_ID }} >> .env
-        echo CLIENT_SECRET=${{ secrets.ODINBACKEND_CLIENT_SECRET }} >> .env
-        echo ODIN_CLIENT_ID=${{ secrets.ODINBACKEND_ODIN_CLIENT_ID }} >> .env
-        echo ODIN_CLIENT_SECRET=${{ secrets.ODINBACKEND_ODIN_CLIENT_SECRET }} >> .env
-        echo ODIN_OP_CLIENT_ID=${{ secrets.ODINBACKEND_ODIN_OP_CLIENT_ID }} >> .env
-        echo ODIN_OP_CLIENT_SECRET=${{ secrets.ODINBACKEND_ODIN_OP_CLIENT_SECRET }} >> .env
-        echo TEST_TOKEN=${{ secrets.ODINBACKEND_TEST_TOKEN }} >> .env
-        echo OP_TEST_TOKEN=${{ secrets.ODINBACKEND_OP_TEST_TOKEND }} >> .env
-        echo USE_SAVED=${{ secrets.ODINBACKEND_USE_SAVED }} >> .env
-        cat .env
+        echo HelloWorrld
+        .touch .env
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2

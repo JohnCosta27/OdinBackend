@@ -10,6 +10,7 @@ const {
 	getDbErrorMessage,
 	getSuccessMessage,
 } = require('./routers/messages.service');
+const { getUser } = require('./requests/Auth0API.service');
 const subjectRouter = require('./routers/subjects.router');
 const progressRouter = require('./routers/progress.router');
 const filesRouter = require('./routers/files.router');

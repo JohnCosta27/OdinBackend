@@ -86,6 +86,7 @@ const getBackendTestOpToken = async () => {
 
 const getAllUsers = async () => {
 	const accessToken = await getApiAcessToken();
+	console.log(accessToken.access_token);
 	const options = {
 		url: `https://${domain}/api/v2/users`,
 		headers: {
@@ -100,9 +101,28 @@ const getAllUsers = async () => {
 		return getRequestFailed();
 	}
 };
+
+const getUser = async (id) => {
+	const accessToken = await getApiAcessToken();
+	const options = {
+		url: `https://${domain}/api/v2/userinfo/?access_token=${id}`,
+		headers: {
+			'content-type': 'application/json',
+			Authorization: `Bearer ${accessToken.access_token}`,
+		},
+	};
+	try {
+		const response = await axios.request(options);
+		return response.data;
+	} catch (error) {
+		return getRequestFailed();
+	}
+};
+
 module.exports = {
 	getApiAcessToken,
 	getBackendTestToken,
 	getAllUsers,
 	getBackendTestOpToken,
+	getUser,
 };

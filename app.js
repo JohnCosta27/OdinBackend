@@ -16,6 +16,7 @@ const progressRouter = require('./routers/progress.router');
 const filesRouter = require('./routers/files.router');
 const usersRouter = require('./routers/users.router');
 const usercontentRouter = require('./routers/usercontent.router');
+const pointcontent = require('./routers/pointcontent.routers');
 const app = express();
 const apiRouter = express.Router();
 
@@ -33,6 +34,7 @@ app.use('/progress', progressRouter);
 app.use('/files', filesRouter);
 app.use('/users', usersRouter);
 app.use('/usercontent', usercontentRouter);
+app.use('/pointcontent', pointcontent);
 
 /**
  * API Sync method

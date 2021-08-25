@@ -27,36 +27,45 @@ const files = express.Router();
  */
 
 files.post('/upload', checkJwt, upload.single('note'), async (req, res) => {
-	const dimensions = sizeOf(req.file.buffer);
-	const createNote = await createNoteDb(req.file.originalname, dimensions.width, dimensions.height);
-	if (createNote.error != undefined) {
-		res.send(getDbErrorMessage(createNote.error));
-	} else {
-		const { data, error } = await supabase
-			.from('point_notes')
-			.insert([
-				{ noteid: createNote.data[0].id, pointid: req.body.pointid },
-			]);
-		if (error != undefined) {
-			res.send(getDbErrorMessage(error));
+	try {
+		const dimensions = sizeOf(req.file.buffer);
+		const createNote = await createNoteDb(
+			req.file.originalname,
+			dimensions.width,
+			dimensions.height
+		);
+		if (createNote.error != undefined) {
+			res.send(getDbErrorMessage(createNote.error));
 		} else {
-			const formData = {
-				file: {
-					value: req.file.buffer,
-					options: {
-						filename: createNote.data[0].id,
-						contentType: req.file.mimetype
-					}
-				}
-			};
-			const options = {
-				url: path + createNote.data[0].id,
-				headers: supabase.storage.headers,
-				formData: formData
+			const { data, error } = await supabase.from('point_notes').insert([
+				{
+					noteid: createNote.data[0].id,
+					pointid: req.body.pointid,
+				},
+			]);
+			if (error != undefined) {
+				res.send(getDbErrorMessage(error));
+			} else {
+				const formData = {
+					file: {
+						value: req.file.buffer,
+						options: {
+							filename: createNote.data[0].id,
+							contentType: req.file.mimetype,
+						},
+					},
+				};
+				const options = {
+					url: path + createNote.data[0].id,
+					headers: supabase.storage.headers,
+					formData: formData,
+				};
+				request.post(options);
+				res.send(getSuccessMessage());
 			}
-			request.post(options);
-			res.send(getSuccessMessage());
 		}
+	} catch (error) {
+		res.status(400).send(getDbErrorMessage());
 	}
 });
 
@@ -76,8 +85,10 @@ files.get('/getnotes', checkJwt, async (req, res) => {
 const createNoteDb = async (filename, width, height) => {
 	const { data, error } = await supabase
 		.from('notes')
-		.insert([{ original_file_name: filename, width: width, height: height }]);
+		.insert([
+			{ original_file_name: filename, width: width, height: height },
+		]);
 	return { data: data, error: error };
-}
+};
 
 module.exports = files;

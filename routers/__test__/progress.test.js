@@ -39,7 +39,7 @@ describe(`POST ${addEndpoint}`, () => {
 		request(app)
 			.post(addEndpoint)
 			.set('Authorization', 'Bearer ' + token)
-            .set('Content-Type', 'application/json')
+			.set('Content-Type', 'application/json')
 			.send({
 				points: ['03fa4555-509c-4636-9728-bb2de689e4d3'],
 			})
@@ -80,7 +80,7 @@ describe(`GET ${getUserProgressEndpoint}`, () => {
 			.get(getUserProgressEndpoint)
 			.set('Authorization', 'Bearer ' + opToken)
 			.query({ studentid: jwt.sub })
-            .expect(200);
+			.expect(200);
 	});
 });
 
@@ -101,5 +101,8 @@ describe(`GET ${getProgressInSubjectEndpoint}`, () => {
 
 afterAll(async () => {
 	const jwt = jwtDecode(token);
-	await supabase.from('student_points').delete().match({student_id: jwt.sub});
+	await supabase
+		.from('student_points')
+		.delete()
+		.match({ student_id: jwt.sub });
 });
